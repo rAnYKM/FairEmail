@@ -1,2 +1,4 @@
 include ':app', ':openpgp-api'
+include ':libmraacintegration'
 project(':openpgp-api').projectDir = new File('openpgp-api')
+project(':libmraacintegration').projectDir = new File('H:\\MRAACIntegration\\app\\libmraacintegration')

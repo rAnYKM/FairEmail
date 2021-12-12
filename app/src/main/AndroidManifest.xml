@@ -4,6 +4,8 @@
     package="eu.faircode.email"
     android:installLocation="internalOnly">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -26,7 +28,9 @@
         android:maxSdkVersion="22" />
 
     <!-- https://github.com/leolin310148/ShortcutBadger/pull/368 -->
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="com.vivo.notification.permission.BADGE_ICON" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <!-- https://developer.android.com/guide/topics/manifest/uses-feature-element#features-reference -->
     <uses-feature
@@ -461,6 +465,33 @@
                 <action android:name="android.service.controls.ControlsProviderService" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".mraac.contexts.OnsiteContextService"
+            android:foregroundServiceType="location"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".mraac.BYODAuthenticationService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".mraac.BYODAccessService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".mraac.BYODAdaptationService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="ca.uwaterloo.crysp.libmraacintegration.permission.STAGE_ACQUIRE" />
+
+        <service android:name=".mraac.BYODContextService" />
+        <service android:name=".mraac.authenticators.GaitAuthService"/>
+        <service android:name=".mraac.contexts.DummyConditionService"/>
+        <service android:name=".mraac.contexts.DummyContextService"/>
+        <service android:name=".mraac.authenticators.DummyAuthService"/>
+        <service android:name=".mraac.contexts.OnFootService" />
+        <service android:name=".mraac.contexts.ThresholdMovementService" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 216,
-    "identityHash": "a0c2be06af6e4bffc0987d6811aeecfc",
+    "identityHash": "7c8043fa84ad53fc4b98a77bf91d25db",
     "entities": [
       {
         "tableName": "identity",
@@ -1651,6 +1651,22 @@
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_message_folder_uid` ON `${TABLE_NAME}` (`folder`, `uid`)"
           },
           {
+            "name": "index_message_replying",
+            "unique": false,
+            "columnNames": [
+              "replying"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_message_replying` ON `${TABLE_NAME}` (`replying`)"
+          },
+          {
+            "name": "index_message_forwarding",
+            "unique": false,
+            "columnNames": [
+              "forwarding"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_message_forwarding` ON `${TABLE_NAME}` (`forwarding`)"
+          },
+          {
             "name": "index_message_inreplyto",
             "unique": false,
             "columnNames": [
@@ -2611,7 +2627,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a0c2be06af6e4bffc0987d6811aeecfc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7c8043fa84ad53fc4b98a77bf91d25db')"
     ]
   }
 }

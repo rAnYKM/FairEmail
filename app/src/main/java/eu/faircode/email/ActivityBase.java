@@ -70,7 +70,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-abstract class ActivityBase extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+import eu.faircode.email.mraac.SecureBaseActivity;
+
+abstract class ActivityBase extends SecureBaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private Context originalContext;
     private boolean visible;
     private boolean contacts;
