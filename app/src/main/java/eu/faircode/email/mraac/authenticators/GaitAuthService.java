@@ -55,8 +55,8 @@ public class GaitAuthService extends Service implements SensorEventListener {
     private GaitData buffer;
 
     // for test and evaluation only
-//    private FakeSensorDataProvider fakeAccProvider;
-//    private FakeSensorDataProvider fakeGyroProvider;
+    private FakeSensorDataProvider fakeAccProvider;
+    private FakeSensorDataProvider fakeGyroProvider;
     private SimTrainer accTrainer;
     private SimTrainer gyroTrainer;
     SharedPreferences.Editor editor1;
@@ -83,48 +83,48 @@ public class GaitAuthService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
-
-
-
+        reader1 = getSharedPreferences("mraac_debug", MODE_PRIVATE);
         if (USE_FAKE_DATA) {
 
             try {
-                reader1 = getSharedPreferences("mraac_debug", MODE_PRIVATE);
+                // InputStream is1 = getAssets().open(reader1.getString("basedir", ".") + "/tacc.txt");
+                InputStream is1 = getAssets().open("acc2.csv");
+                fakeAccProvider = FakeSensorDataProvider.fromInputStream(is1);
+                // accTrainer = SimTrainer.fromInputStream(is1);
+                // InputStream is2 = getAssets().open(reader1.getString("basedir", ".") + "/tgyro.txt");
+                InputStream is2 = getAssets().open("gyro2.csv");
+                fakeGyroProvider = FakeSensorDataProvider.fromInputStream(is2);
+                // gyroTrainer = SimTrainer.fromInputStream(is2);
 
-                InputStream is1 = getAssets().open(reader1.getString("basedir", ".") + "/tacc.txt");
-                // fakeAccProvider = FakeSensorDataProvider.fromInputStream(is1);
-                accTrainer = SimTrainer.fromInputStream(is1);
-                InputStream is2 = getAssets().open(reader1.getString("basedir", ".") + "/tgyro.txt");
-                //fakeGyroProvider = FakeSensorDataProvider.fromInputStream(is2);
-                gyroTrainer = SimTrainer.fromInputStream(is2);
-
-                if (reader1.contains("basetime1") && reader1.getLong("basetime1", 0) > 0) {
-                    accTrainer.setBaseTime(reader1.getLong("basetime1", 0));
-                    Log.i(TAG, "set base time for acc, " + accTrainer.getBaseTime());
-                }
-                if (reader1.contains("basetime2") && reader1.getLong("basetime2", 0) > 0) {
-                    gyroTrainer.setBaseTime(reader1.getLong("basetime2", 0));
-                    Log.i(TAG, "set base time for gyro, " + gyroTrainer.getBaseTime());
-                }
+//                if (reader1.contains("basetime1") && reader1.getLong("basetime1", 0) > 0) {
+//                    accTrainer.setBaseTime(reader1.getLong("basetime1", 0));
+//                    Log.i(TAG, "set base time for acc, " + accTrainer.getBaseTime());
+//                }
+//                if (reader1.contains("basetime2") && reader1.getLong("basetime2", 0) > 0) {
+//                    gyroTrainer.setBaseTime(reader1.getLong("basetime2", 0));
+//                    Log.i(TAG, "set base time for gyro, " + gyroTrainer.getBaseTime());
+//                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            try {
-                File f = new File(getFilesDir(), "model.tflite");
-                if (!f.exists()) {
-                    InputStream ist = getAssets().open(reader1.getString("hostdir", ".") + "/model.tflite");
-                    Log.i("MRAAC_EXP", "CREATE MODE FOR " + reader1.getString("hostdir", "."));
-                    interpreter = new Interpreter(Objects.requireNonNull(createFileFromInputStream(ist)));
-                } else {
-                    interpreter = new Interpreter(f);
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-
         }
+
+        try {
+            File f = new File(getFilesDir(), "model.tflite");
+            if (!f.exists()) {
+                InputStream ist = getAssets().open(reader1.getString("hostdir", ".") + "/model.tflite");
+                // InputStream ist = getAssets().open("model.tflite");
+                Log.i("MRAAC_EXP", "CREATE MODE FOR " + reader1.getString("hostdir", "."));
+                interpreter = new Interpreter(Objects.requireNonNull(createFileFromInputStream(ist)));
+            } else {
+                interpreter = new Interpreter(f);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -132,19 +132,21 @@ public class GaitAuthService extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mAccelerometer, interval);
         mSensorManager.registerListener(this, mGyroscope, interval);
 
-        Log.d("MRAAC_EXP", "gait start");
+        // Log.d("MRAAC_EXP", "gait start");
     }
 
     @Override
     public void onDestroy() {
-        editor1 = getSharedPreferences("mraac_debug", MODE_PRIVATE).edit();
-        editor1.putLong("basetime1", accTrainer.getBaseTime() * S_TO_US);
-        editor1.putLong("basetime2", gyroTrainer.getBaseTime()* S_TO_US);
-        editor1.apply();
+//        if (USE_FAKE_DATA) {
+//            editor1 = getSharedPreferences("mraac_debug", MODE_PRIVATE).edit();
+//            editor1.putLong("basetime1", accTrainer.getBaseTime() * S_TO_US);
+//            editor1.putLong("basetime2", gyroTrainer.getBaseTime() * S_TO_US);
+//            editor1.apply();
+//        }
 
         super.onDestroy();
-        long timeAnchor = SystemClock.elapsedRealtimeNanos();
-        Log.i("Time Anchor", "contextonfootadapt:" + timeAnchor);
+        // long timeAnchor = SystemClock.elapsedRealtimeNanos();
+        // Log.i("Time Anchor", "contextonfootadapt:" + timeAnchor);
 
         mSensorManager.unregisterListener(this); // , mAccelerometer);
         interpreter.close();
@@ -158,12 +160,12 @@ public class GaitAuthService extends Service implements SensorEventListener {
         switch(sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 if (USE_FAKE_DATA) {
-                    if (!accTrainer.isReady()) {
-
-                        Log.d(TAG, "SET FIRST READY");
-                        accTrainer.setBaseTime(sensorEvent.timestamp);
-                    }
-                    double[] tmp = accTrainer.nextMatch(sensorEvent.timestamp);
+//                    if (!accTrainer.isReady()) {
+//                        Log.d(TAG, "SET FIRST READY");
+//                        accTrainer.setBaseTime(sensorEvent.timestamp);
+//                    }
+//                    double[] tmp = accTrainer.nextMatch(sensorEvent.timestamp);
+                    float[] tmp = fakeAccProvider.getNext();
                     if (tmp == null) {
                         if (!debug_flag)
                             Log.i("MRAAC_EXP", "ACC ALL OVER");
@@ -180,8 +182,9 @@ public class GaitAuthService extends Service implements SensorEventListener {
                 break;
             case Sensor.TYPE_GYROSCOPE:
                 if (USE_FAKE_DATA) {
-                    if (!gyroTrainer.isReady()) gyroTrainer.setBaseTime(sensorEvent.timestamp);
-                    double[] tmp = gyroTrainer.nextMatch(sensorEvent.timestamp);
+                    // if (!gyroTrainer.isReady()) gyroTrainer.setBaseTime(sensorEvent.timestamp);
+                    // double[] tmp = gyroTrainer.nextMatch(sensorEvent.timestamp);
+                    float[] tmp = fakeGyroProvider.getNext();
                     if (tmp == null) {
                         if (!debug_flag)
                             Log.i("MRAAC_EXP", "GYRO ALL OVER");
@@ -290,11 +293,11 @@ public class GaitAuthService extends Service implements SensorEventListener {
 
     public void sendResult(double result) {
         //Log.i(TAG, AUTH_GAIT_ID + " authentcation score: " + result);
-        Log.d("MRAAC_EXP", "gait " + result);
+        // Log.d("MRAAC_EXP", "gait " + result);
         Intent intent = new Intent(AUTH_GAIT_ID);
         intent.putExtra("result", result);
         long timeAnchor = SystemClock.elapsedRealtimeNanos();
-        Log.i("Time Anchor", "authissue:" + timeAnchor);
+        // Log.i("Time Anchor", "authissue:" + timeAnchor);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

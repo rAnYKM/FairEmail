@@ -44,8 +44,8 @@ public class OnsiteContextService extends Service implements ContextServiceBinde
     private double[][] companyLocation= new double[][]{{43.472, -80.544}, {43.475,-80.54}};
     private int currentLocationState = 0;
 
-    boolean mockMode = true;
-    private static final double interval = 60;
+    boolean mockMode = false;
+    private static final double interval = 10;
 
 
     private ExponentialDistribution expd;
@@ -53,14 +53,16 @@ public class OnsiteContextService extends Service implements ContextServiceBinde
     private Timer timer = new Timer();
 
     public OnsiteContextService() {
-        expd = new ExponentialDistribution(interval);
-        timerTask = new ExponentialTaskGenerator(expd, timer, new TaskCallback() {
-            @Override
-            public void run() {
-                currentLocationState = 1 - currentLocationState;
-                sendResult(OnsiteContextService.this, CONTEXT_ONSITE_ID, currentLocationState);
-            }
-        });
+        if (mockMode) {
+            expd = new ExponentialDistribution(interval);
+            timerTask = new ExponentialTaskGenerator(expd, timer, new TaskCallback() {
+                @Override
+                public void run() {
+                    currentLocationState = 1 - currentLocationState;
+                    sendResult(OnsiteContextService.this, CONTEXT_ONSITE_ID, currentLocationState);
+                }
+            });
+        }
     }
 
     @Override
@@ -82,7 +84,7 @@ public class OnsiteContextService extends Service implements ContextServiceBinde
                 if (!mockMode) {
                     if (location.getLatitude() < companyLocation[1][0] && location.getLatitude() > companyLocation[0][0]
                             && location.getLongitude() < companyLocation[1][1] && location.getLongitude() > companyLocation[0][1]) {
-                        sendResult(OnsiteContextService.this, CONTEXT_ONSITE_ID, 1);
+                        sendResult(OnsiteContextService.this, CONTEXT_ONSITE_ID, 0);
                     } else {
                         sendResult(OnsiteContextService.this, CONTEXT_ONSITE_ID, 0);
                     }
@@ -99,7 +101,7 @@ public class OnsiteContextService extends Service implements ContextServiceBinde
         }
 
         if (mockMode) {
-            timer.schedule(timerTask, (long) (expd.sample() * 1000));
+            timer.schedule(timerTask, (long) expd.sample() * 1000);
         }
 
     }

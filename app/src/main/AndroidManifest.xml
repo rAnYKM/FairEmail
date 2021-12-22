@@ -28,9 +28,10 @@
         android:maxSdkVersion="22" />
 
     <!-- https://github.com/leolin310148/ShortcutBadger/pull/368 -->
-    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+
     <uses-permission android:name="com.vivo.notification.permission.BADGE_ICON" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <!-- https://developer.android.com/guide/topics/manifest/uses-feature-element#features-reference -->
     <uses-feature

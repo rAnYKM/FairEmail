@@ -3,8 +3,7 @@ package eu.faircode.email.mraac;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-
-import androidx.preference.PreferenceManager;
+import android.os.Debug;
 
 import ca.uwaterloo.cs.crysp.libmraacintegration.adaptation.AdaptationService;
 import ca.uwaterloo.cs.crysp.libmraacintegration.adaptation.MultiStageModel;
@@ -20,8 +19,8 @@ public class BYODAdaptationService extends AdaptationService {
             "218719", "998757"
     };
 
-    String attacker = users[8];
-    String host = users[8];
+    String attacker = users[0];
+    String host = users[0];
 
     @Override
     public void onCreate() {
@@ -42,8 +41,10 @@ public class BYODAdaptationService extends AdaptationService {
     @Override
     public void initModel() {
         // BYOD Logic
+
+        // Debug.startMethodTracing("init-s8-9");
         MultiStageModel model = ExampleBYOD.buildModel();
-        System.out.print(model.toCSV());
+        // System.out.print(model.toCSV());
         for (Stage stage: model.getStages()) {
             if (stage.isLockedStage()) stage.setScheme((ExampleBYOD.emptyAdaptationScheme()));
             else if (stage.getRiskType().equals("offsite")) {
@@ -60,6 +61,7 @@ public class BYODAdaptationService extends AdaptationService {
 
         }
         setModel(model);
+        // Debug.stopMethodTracing();
 //        MultiStageModel model = ExampleDummy.buildModel();
 //        System.out.print(model.toCSV());
 //        for (Stage stage: model.getStages()) {

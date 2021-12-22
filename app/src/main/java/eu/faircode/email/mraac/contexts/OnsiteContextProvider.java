@@ -19,34 +19,21 @@ public class OnsiteContextProvider extends BaseContextProvider {
     @Override
     public void start(Adaptation adaptation) {
         super.start(adaptation);
-        Intent i = new Intent(getContext(), OnsiteContextService.class);
-        getContext().startService(i);
+        getContext().startService(new Intent(getContext(), OnsiteContextService.class));
     }
 
     @Override
     public void stop() {
         super.stop();
-        Intent i = new Intent(getContext(), OnsiteContextService.class);
-        getContext().stopService(i);
+        getContext().stopService(new Intent(getContext(), OnsiteContextService.class));
     }
-
 
     @Override
-    public void adapt(Adaptation adaptation) {
-
-    }
+    public void adapt(Adaptation adaptation) { }
 
     @Override
     public void processResult(int result) {
-        // in this function, you need to convert the raw result to signals
-        switch (result) {
-            case 1:
-                sendContextSignal(new Signal(CONTEXT_ONSITE, getId()));
-                break;
-            case 0:
-                sendContextSignal(new Signal(CONTEXT_OFFSITE, getId()));
-                break;
-        }
-
+        if (result == 1) sendContextSignal(new Signal(CONTEXT_ONSITE, getId()));
+        else sendContextSignal(new Signal(CONTEXT_OFFSITE, getId()));
     }
 }

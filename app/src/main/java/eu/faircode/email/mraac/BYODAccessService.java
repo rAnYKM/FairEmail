@@ -29,7 +29,7 @@ public class BYODAccessService extends AccessControlService {
     //                LocalBroadcastManager.getInstance(this).sendBroadcast(signal.toIntent(SERVICE_ACCESS));
 
     public static final String REPORT_RESOURCE_NAME = "Report resource name";
-    private static final boolean USE_FAKE = true;
+    private static final boolean USE_FAKE = false;
     private static final double interval = 30;
     public static final String REQUEST_SENSITIVITY = "Request sensitivity";
 
@@ -40,14 +40,14 @@ public class BYODAccessService extends AccessControlService {
     private int fakeSensitivity = 1;
 
     public BYODAccessService() {
-        expd = new ExponentialDistribution(interval);
-        timerTask = new ExponentialTaskGenerator(expd, timer, new TaskCallback() {
-            @Override
-            public void run() {
-                fakeSensitivity = 3 - fakeSensitivity;
-                sensitivityChange(fakeSensitivity);
-            }
-        });
+//        expd = new ExponentialDistribution(interval);
+//        timerTask = new ExponentialTaskGenerator(expd, timer, new TaskCallback() {
+//            @Override
+//            public void run() {
+//                fakeSensitivity = 3 - fakeSensitivity;
+//                sensitivityChange(fakeSensitivity);
+//            }
+//        });
     }
 
     @Override
@@ -62,7 +62,7 @@ public class BYODAccessService extends AccessControlService {
         setSensitivityDictionary(map);
 
         if (USE_FAKE) {
-            timer.schedule(timerTask, (long) (expd.sample() * 1000));
+            // timer.schedule(timerTask, (long) (expd.sample() * 1000));
 
         }
         setCurrentResource(initResourceRequest(), true);

@@ -72,6 +72,8 @@ import java.util.Map;
 
 import eu.faircode.email.mraac.SecureBaseActivity;
 
+//
+
 abstract class ActivityBase extends SecureBaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private Context originalContext;
     private boolean visible;

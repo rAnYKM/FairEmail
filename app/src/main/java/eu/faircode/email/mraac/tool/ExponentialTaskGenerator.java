@@ -21,7 +21,7 @@ public class ExponentialTaskGenerator extends TimerTask {
     @Override
     public void run() {
         callback.run();
-        long time = (long) (expd.sample() * 1000);
+        long time = (long) 2000; // (expd.sample() * 1000 + 1000);
         Log.i("Access", "next event: " + time);
         timer.schedule(new ExponentialTaskGenerator(expd, timer, callback),
                 time);

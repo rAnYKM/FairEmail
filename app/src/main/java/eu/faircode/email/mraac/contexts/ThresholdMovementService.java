@@ -26,7 +26,7 @@ import eu.faircode.email.mraac.tool.SimTrainer;
 
 public class ThresholdMovementService extends Service implements SensorEventListener, ContextServiceBinder {
     private static final String TAG = "MovementService";
-    private static final boolean USE_FAKE_DATA = true;
+    private static final boolean USE_FAKE_DATA = false;
 
     private static final int SAMPLING_RATE = 50;
     private static final int S_TO_US = 1000000;
@@ -36,6 +36,7 @@ public class ThresholdMovementService extends Service implements SensorEventList
     private static final double LO_THRES = 0.3;
     private long lastActivationTime = -1;
     private boolean isMoving = false;
+    private int counter = 0;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -58,7 +59,6 @@ public class ThresholdMovementService extends Service implements SensorEventList
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
 
             if (reader1.contains("basetime3") && reader1.getLong("basetime3", 0) > 0) {
                 trainer.setBaseTime(reader1.getLong("basetime3", 0));
@@ -113,26 +113,38 @@ public class ThresholdMovementService extends Service implements SensorEventList
 
         mag = Math.abs(mag - 9.81);
 
-        if (mag >= HI_THRES) {
-            if (!isMoving) {
-                isMoving = true;
-                lastActivationTime = sensorEvent.timestamp;
-                sendResult(this, CONTEXT_ONFOOT_ID, 1);
-            } else {
-                lastActivationTime = sensorEvent.timestamp;
-            }
-        } else if (mag <= LO_THRES) {
-            if (lastActivationTime == -1) {
-                sendResult(this, CONTEXT_ONFOOT_ID, 0);
-                lastActivationTime = 0;
-            }
 
-            if (isMoving && (sensorEvent.timestamp - lastActivationTime) / S_TO_US / 1000 >= MIN_ACTIVATION_TIME) {
-                isMoving = false;
-                sendResult(this, CONTEXT_ONFOOT_ID, 0);
-            }
+        counter += 1;
+        if (counter == 50*15)
+            sendResult(this, CONTEXT_ONFOOT_ID, 1);
 
+        if (counter == 50*30) {
+            sendResult(this, CONTEXT_ONFOOT_ID, 0);
+            counter = 0;
         }
+
+        // return;
+
+//        if (mag >= HI_THRES) {
+//            if (!isMoving) {
+//                isMoving = true;
+//                lastActivationTime = sensorEvent.timestamp;
+//                sendResult(this, CONTEXT_ONFOOT_ID, 1);
+//            } else {
+//                lastActivationTime = sensorEvent.timestamp;
+//            }
+//        } else if (mag <= LO_THRES) {
+//            if (lastActivationTime == -1) {
+//                sendResult(this, CONTEXT_ONFOOT_ID, 1);
+//                lastActivationTime = 0;
+//            }
+//
+//            if (isMoving && (sensorEvent.timestamp - lastActivationTime) / S_TO_US / 1000 >= MIN_ACTIVATION_TIME) {
+//                isMoving = false;
+//                sendResult(this, CONTEXT_ONFOOT_ID, 1);
+//            }
+//
+//        }
     }
 
     public double getMagnitude(float[] values) {

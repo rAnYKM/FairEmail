@@ -15,21 +15,16 @@ public class GaitAuthenticator extends BaseAuthenticator {
     @Override
     public void start(Adaptation adaptation) {
         super.start(adaptation);
-        Intent i=new Intent(getContext(), GaitAuthService.class);
-        getContext().startService(i);
+        getContext().startService(new Intent(getContext(), GaitAuthService.class));
         adapt(adaptation);
     }
 
     @Override
     public void stop() {
         super.stop();
-        Intent i=new Intent(getContext(), GaitAuthService.class);
-        getContext().stopService(i);
+        getContext().stopService(new Intent(getContext(), GaitAuthService.class));
     }
 
     @Override
-    public void adapt(Adaptation adaptation) {
-
-    }
-
+    public void adapt(Adaptation adaptation) {}
 }

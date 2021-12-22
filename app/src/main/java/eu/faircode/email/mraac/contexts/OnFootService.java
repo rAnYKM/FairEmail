@@ -37,7 +37,7 @@ public class OnFootService extends Service implements ContextServiceBinder{
 
     // for experiments only
     MockOutputProvider<Integer> mockOutputProvider;
-    boolean mockMode = true;
+    boolean mockMode = false;
 
     @Nullable
     @Override
@@ -147,11 +147,11 @@ public class OnFootService extends Service implements ContextServiceBinder{
                     Log.i(TAG, "constant detect: " + result.getMostProbableActivity());
                     Intent i = new Intent(CONTEXT_ONFOOT_ID);
                     if (event.getType() == DetectedActivity.ON_FOOT || event.getType() == DetectedActivity.WALKING) {
-                        sendResult(this, CONTEXT_ONFOOT_ID, 0);
+                        sendResult(this, CONTEXT_ONFOOT_ID, 1);
                     } else {
                         long timeAnchor = SystemClock.elapsedRealtimeNanos();
                         Log.i("Time Anchor", "Rececontext:" + timeAnchor);
-                        sendResult(this, CONTEXT_ONFOOT_ID, 0);
+                        sendResult(this, CONTEXT_ONFOOT_ID, 1);
                     }
                 }
             }
